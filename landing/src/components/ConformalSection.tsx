@@ -142,8 +142,7 @@ export function ConformalSection({ data }: Props) {
         <p className="chart-caption">
           A single fixed-width interval calibrated on pooled residuals over-covers calm
           days and under-covers volatile ones — when the interval matters most. Natural
-          next step: adaptive or regime-weighted conformal methods, not a generic future-work
-          bullet.
+          next step: regime-weighted or adaptive conformal.
         </p>
       </div>
     </div>

@@ -30,6 +30,21 @@ interface SeriesBundle {
   display: PredictionPoint[];
 }
 
+interface TransitionAnalysis {
+  threshold: number;
+  transition: {
+    n: number;
+    naive: Metrics;
+    hybrid: Metrics;
+    hybridWinRate: number;
+  };
+  stable: {
+    n: number;
+    naive: Metrics;
+    hybrid: Metrics;
+  };
+}
+
 function parseCsv(content: string): Row[] {
   const lines = content.trim().split("\n");
   const headers = lines[0].split(",");
@@ -81,6 +96,78 @@ function lag1Autocorrelation(values: number[]): number {
     if (i < n - 1) num += d * (values[i + 1] - mean);
   }
   return num / den;
+}
+
+/** Linear-interpolation quantile, matching numpy's default behavior. */
+function quantile(sortedValues: number[], q: number): number {
+  const pos = (sortedValues.length - 1) * q;
+  const base = Math.floor(pos);
+  const rest = pos - base;
+  if (sortedValues[base + 1] !== undefined) {
+    return sortedValues[base] + rest * (sortedValues[base + 1] - sortedValues[base]);
+  }
+  return sortedValues[base];
+}
+
+/**
+ * Compares naive persistence vs the hybrid model on "transition days" (top
+ * 10% of days by day-over-day change in actual realized vol) vs "stable
+ * days" (the rest). Naive persistence's `predicted` field is already
+ * yesterday's actual value (see buildNaiveSeries), so |actual - predicted|
+ * on the naive series IS the day-over-day change — no extra computation
+ * needed to get the transition magnitude.
+ */
+function computeTransitionAnalysis(
+  naive: PredictionPoint[],
+  hybrid: PredictionPoint[],
+): TransitionAnalysis {
+  const hybridByDate = new Map(hybrid.map((p) => [p.date, p]));
+
+  const paired = naive
+    .map((n) => {
+      const h = hybridByDate.get(n.date);
+      if (!h) return null;
+      return {
+        date: n.date,
+        naiveActual: n.actual,
+        naivePred: n.predicted,
+        hybridActual: h.actual,
+        hybridPred: h.predicted,
+        magnitude: Math.abs(n.actual - n.predicted),
+      };
+    })
+    .filter((p): p is NonNullable<typeof p> => p !== null);
+
+  const sortedMagnitudes = paired.map((p) => p.magnitude).sort((a, b) => a - b);
+  const threshold = quantile(sortedMagnitudes, 0.9);
+
+  const transitionRows = paired.filter((p) => p.magnitude >= threshold);
+  const stableRows = paired.filter((p) => p.magnitude < threshold);
+
+  const toNaivePoints = (rows: typeof paired): PredictionPoint[] =>
+    rows.map((r) => ({ date: r.date, actual: r.naiveActual, predicted: r.naivePred }));
+  const toHybridPoints = (rows: typeof paired): PredictionPoint[] =>
+    rows.map((r) => ({ date: r.date, actual: r.hybridActual, predicted: r.hybridPred }));
+
+  const hybridWins = transitionRows.filter(
+    (r) =>
+      Math.abs(r.hybridActual - r.hybridPred) < Math.abs(r.naiveActual - r.naivePred),
+  ).length;
+
+  return {
+    threshold,
+    transition: {
+      n: transitionRows.length,
+      naive: computeMetrics(toNaivePoints(transitionRows)),
+      hybrid: computeMetrics(toHybridPoints(transitionRows)),
+      hybridWinRate: hybridWins / transitionRows.length,
+    },
+    stable: {
+      n: stableRows.length,
+      naive: computeMetrics(toNaivePoints(stableRows)),
+      hybrid: computeMetrics(toHybridPoints(stableRows)),
+    },
+  };
 }
 
 /** Largest-Triangle-Three-Buckets downsampling (shape-preserving). */
@@ -270,6 +357,10 @@ function main() {
   const predictions = loadPredictions();
   const conformal = loadConformal();
   const featureImportance = loadFeatureImportance();
+  const transitionAnalysis = computeTransitionAnalysis(
+    predictions.naive.daily,
+    predictions.hybrid.daily,
+  );
 
   const covidStart = "2020-02-15";
   const covidEnd = "2020-04-15";
@@ -372,6 +463,7 @@ function main() {
     windows,
     conformal,
     featureImportance,
+    transitionAnalysis,
   };
 
   fs.writeFileSync(
@@ -382,6 +474,7 @@ function main() {
   console.log(`Wrote site-data.json (${(fs.statSync(path.join(OUT_DIR, "site-data.json")).size / 1024).toFixed(0)} KB)`);
   console.log("Metrics:", predictions.metrics);
   console.log("Conformal regime split:", conformal.regimeSplit);
+  console.log("Transition analysis:", transitionAnalysis);
 }
 
 main();

@@ -61,7 +61,7 @@ function App() {
         <Section
           id="results"
           title="Results"
-          subtitle="Predicted vs actual realized volatility — data-driven, interactive"
+          subtitle="Predicted vs actual realized volatility"
         >
           <Suspense fallback={<ChartFallback />}>
             <ResultsSection data={data} />

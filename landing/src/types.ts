@@ -3,12 +3,12 @@ export interface PredictionPoint {
   actual: number;
   predicted: number;
 }
-
+ 
 export interface Metrics {
   mae: number;
   rmse: number;
 }
-
+ 
 export interface ConformalPoint {
   date: string;
   actual: number;
@@ -16,17 +16,17 @@ export interface ConformalPoint {
   lower: number;
   upper: number;
 }
-
+ 
 export interface FeatureRow {
   feature: string;
   importance: number;
 }
-
+ 
 export interface SeriesBundle {
   daily: PredictionPoint[];
   display: PredictionPoint[];
 }
-
+ 
 export interface WindowData {
   label?: string;
   threshold?: number;
@@ -37,12 +37,27 @@ export interface WindowData {
   hybrid: PredictionPoint[];
   naive: PredictionPoint[];
 }
-
+ 
 export interface CrisisRegimeMetrics {
   crisis: Metrics;
   calm: Metrics;
 }
-
+ 
+export interface TransitionAnalysis {
+  threshold: number;
+  transition: {
+    n: number;
+    naive: Metrics;
+    hybrid: Metrics;
+    hybridWinRate: number;
+  };
+  stable: {
+    n: number;
+    naive: Metrics;
+    hybrid: Metrics;
+  };
+}
+ 
 export interface SiteData {
   meta: {
     datasetStart: string;
@@ -91,4 +106,5 @@ export interface SiteData {
     randomForest: FeatureRow[];
     hybrid: FeatureRow[];
   };
+  transitionAnalysis: TransitionAnalysis;
 }

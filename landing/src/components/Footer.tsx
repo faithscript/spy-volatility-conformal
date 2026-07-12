@@ -31,8 +31,7 @@ export function Footer() {
         </a>
       </div>
       <p className="footer-note">
-        Not investment advice. Research portfolio piece demonstrating walk-forward
-        evaluation and honest reporting of baseline performance.
+        Not investment advice. Walk-forward evaluation on SPY daily data.
       </p>
     </footer>
   );

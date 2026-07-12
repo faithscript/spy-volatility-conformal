@@ -35,7 +35,7 @@ function buildCaption(model: ModelKey, data: SiteData): string {
     case "randomForest":
       return `Strong aggregate performance driven almost entirely by vol_lag_1 (~97% importance). COVID window MAE: ${fmt(data.windowMetrics.covid.randomForest.mae)}. Crisis-level MAE (actual > ${crisisThreshold}): ${fmt(rfCrisis.crisis.mae)} (${rfDeg.toFixed(1)}× vs calm).`;
     case "hybrid":
-      return `Marginal aggregate gain over RF (~1.6% MAE) but wins only ~50.3% of individual days. Crisis-level MAE (actual > ${crisisThreshold}): ${fmt(hybridCrisis.crisis.mae)} vs RF ${fmt(rfCrisis.crisis.mae)} — hybrid underperforms in the highest-stakes regime despite winning more days there.`;
+      return `Marginal aggregate gain over RF (~1.6% MAE) but wins only ~50.3% of individual days. Crisis-level MAE (actual > ${crisisThreshold}): ${fmt(hybridCrisis.crisis.mae)} vs RF ${fmt(rfCrisis.crisis.mae)} — hybrid underperforms on crisis-level days despite winning more days there.`;
     case "naive":
       return `Tomorrow = today's realized vol. Beats Hybrid and RF on raw MAE because the 21-day rolling target has lag-1 autocorrelation of ${fmt(data.meta.lag1Autocorr, 3)}. The strongest honest baseline for this problem. Crisis-level MAE: ${fmt(naiveCrisis.crisis.mae)}.`;
     default:
