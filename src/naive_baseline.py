@@ -5,15 +5,18 @@ import pandas as pd
 
 
 def compute_naive_predictions(df, train_end_date):
-    test = df[df.index > train_end_date].copy()
+    test = df[df.index > train_end_date]
 
-    test["naive_vol_prediction"] = test["realized_vol"].shift(1)
-    test["actual_vol"] = test["realized_vol"]
+    naive_vol_prediction = test["realized_vol"].shift(1)
+    actual_vol = test["realized_vol"]
 
-    test = test.dropna(subset=["naive_vol_prediction"])
+    results = pd.DataFrame({
+        "date": test.index,
+        "naive_vol_prediction": naive_vol_prediction.values,
+        "actual_vol": actual_vol.values,
+    })
 
-    results = test[["naive_vol_prediction", "actual_vol"]].reset_index()
-    results = results.rename(columns={"Date": "date", "index": "date"})
+    results = results[results["naive_vol_prediction"].notna()].reset_index(drop=True)
 
     return results
 
