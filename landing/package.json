@@ -1,0 +1,33 @@
+{
+  "name": "landing",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "prepare-data": "tsx scripts/prepare-chart-data.ts",
+    "verify-toggles": "tsx scripts/verify-chart-toggles.ts",
+    "dev": "npm run prepare-data && vite",
+    "build": "npm run prepare-data && tsc -b && vite build",
+    "lint": "oxlint",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "papaparse": "^5.5.4",
+    "plotly.js": "^3.7.0",
+    "react": "^19.2.7",
+    "react-dom": "^19.2.7",
+    "react-plotly.js": "^4.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^24.13.2",
+    "@types/papaparse": "^5.5.2",
+    "@types/plotly.js": "^3.0.10",
+    "@types/react": "^19.2.17",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^6.0.3",
+    "oxlint": "^1.71.0",
+    "tsx": "^4.23.0",
+    "typescript": "~6.0.2",
+    "vite": "^8.1.1"
+  }
+}
