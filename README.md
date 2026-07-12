@@ -4,7 +4,7 @@ Forecasts SPY volatility with GARCH, Random Forest, and a GARCH-RF hybrid using
 walk-forward validation, then quantifies uncertainty with split conformal
 prediction.
 
-**Live demo:** https://spy-volatility-conformal.vercel.app/
+**Live demo:** https://spy-volatility-conformal.vercel.app/ — toggle between models and jump to specific time windows (COVID 2020, April 2025, crisis-level days) directly on the charts.
 
 ---
 
