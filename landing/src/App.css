@@ -362,10 +362,14 @@
 
 .mae-comparison {
   margin-top: 2rem;
+  margin-bottom: 2rem;
+  min-height: 260px;
   background: #161b22;
   border: 1px solid #30363d;
   border-radius: 8px;
   padding: 1rem 1rem 0;
+  position: relative;
+  overflow: hidden;
 }
 
 .feature-grid {

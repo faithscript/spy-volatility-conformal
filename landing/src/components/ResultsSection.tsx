@@ -163,7 +163,7 @@ export function ResultsSection({ data }: Props) {
           ]}
           layout={maeBarLayout}
           config={{ displayModeBar: false, responsive: true }}
-          style={{ width: "100%" }}
+          style={{ width: "100%", height: "200" }}
           useResizeHandler
         />
       </div>
