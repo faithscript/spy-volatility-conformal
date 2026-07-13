@@ -1,4 +1,4 @@
-const GITHUB_URL = "https://github.com/faithscript/volatility-forecasting-conformal";
+const GITHUB_URL = "https://github.com/faithscript/spy-volatility-conformal";
 
 const STACK = [
   "Python",
